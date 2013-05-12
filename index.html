@@ -1,9 +1,8 @@
 <html>
 	<head>
     <title>Dalia Magallanes</title>
-    <link rel="stylesheet" type="text/css" href="menu.css" />
+    <link rel="stylesheet" type="text/css" href="styles/menu.css" />
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
-    <script type='text/javascript' id='lt_ws' src='http://localhost:53361/socket.io/lighttable/ws.js'></script>
   </head>
 	<body>
     <ul class="menu">
@@ -18,6 +17,9 @@
     </ul>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
-    <script src="menu.js"></script>
+    <script src="scripts/menu.js"></script>
+    <script>
+      var menu = SideMenu({ "container": ".menu", "default": ".orange" });
+    </script>
 	</body>
 </html>

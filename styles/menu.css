@@ -1,7 +1,7 @@
 body {
   padding: 0;
   margin: 0;
-  background: url(bg.png);
+  background: url(../images/bg.png);
 }
 
 ul.menu {
@@ -10,6 +10,8 @@ ul.menu {
   padding: 0;
   font-family: 'Roboto', sans-serif;
   font-weight: 100;
+  position: fixed;
+  top: 0;
 }
 
 ul.menu li {
@@ -19,7 +21,7 @@ ul.menu li {
   width: auto;
   display: table-cell;
   vertical-align: middle;
-  position: absolute;
+  position: fixed;
   font-size:4.5em;
   left: -1000px;
 
@@ -33,6 +35,11 @@ ul.menu li {
   text-decoration: none;
   display: block;
   padding: 0 0.75em;
+}
+
+.menu-active {
+   
+  left: 0 !important;
 }
 
 .pink { background: #DD79C5; }
