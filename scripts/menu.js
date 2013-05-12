@@ -177,7 +177,7 @@
         self.ScrollTo($li, 2,
           function () {
             $li.addClass("menu-active");
-            $li.animate({"width" : "99%"});
+            $li.animate({"width" : "100%"});
             $li.removeClass("menu-transition");
           }
           );
