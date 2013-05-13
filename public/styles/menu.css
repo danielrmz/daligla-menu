@@ -15,7 +15,6 @@ ul.menu {
 }
 
 ul.menu li {
-  /* font: 4.5em/200% 'Arial'; */
   color: white;
 
   width: auto;
@@ -38,8 +37,12 @@ ul.menu li {
 }
 
 .menu-active {
-   
+  cursor: default;
   left: 0 !important;
+}
+
+.menu-active a {
+  cursor: default;
 }
 
 .pink { background: #DD79C5; }
@@ -50,3 +53,10 @@ ul.menu li {
 .brown { background: #6E4409; }
 .orange { background: #E9A500; }
 .green { background: #55B854 ; }
+
+
+.contents {
+  padding-top: 30px;
+  padding-left: 30px;
+  font-family: 'Roboto', sans-serif;
+}

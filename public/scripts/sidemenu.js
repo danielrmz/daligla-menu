@@ -1,11 +1,5 @@
 (function ($) {
 
-  function log(msg) {
-    if (console.log) {
-      console.log(msg);
-    }
-  }
-
   /**
    * SideMenu creates a scrolling main menu sticked to the left hand side
    *
@@ -16,6 +10,7 @@
     this._options = options || {};
     this._menuContainer = options["container"] ? $(options["container"]) :  null;
     this._default = options["default"] ? $(options["default"]) : null;
+    this._position = options["position"] ? parseInt(options["position"], 10) : 2;
 
     // Initialize page events
     $(function () {
@@ -30,6 +25,7 @@
   SideMenu.prototype._menuContainer = null;
   SideMenu.prototype._initialized = false;
   SideMenu.prototype._default = null;
+  SideMenu.prototype._position = 2;
 
   /**
    * Initializes page events and initial behavior
@@ -38,14 +34,23 @@
    */
   SideMenu.prototype.Initialize = function () {
     var self = this;
+    var $options = self.GetOptions();
 
     if (this._initialized) {
       return this;
     }
 
+    // Parse initial option/url
+    var pathname = location.pathname;
+    var selected = $options.filter(function (idx, ele) { var $a = $(ele).find("a[href='" + pathname + "']"); return $a.size() > 0; });
+
+    if (selected.size() > 0) {
+      self._default = selected.first();
+    }
+
+    // Start events
     self.Resize().Wave(function () { if (self._default !== null) { self.ActivateOption(self._default); } });
 
-    var $options = self.GetOptions();
 
     $options.mouseenter(function (e) { self.ShowOption($(e.target)); });
     $options.mouseleave(function (e) { self.HideOption($(e.target)); });
@@ -116,7 +121,7 @@
 
     $options.css("position", "absolute");
 
-    //this.HideActiveOptions();
+    this.HideActiveOptions();
     $toRemove.clone(true)[menuAction](self.GetContainer());
 
     self.SetPositions(option_height);
@@ -143,17 +148,22 @@
    */
   SideMenu.prototype.HideActiveOptions = function () {
     var $elements = $(".menu-active");
+    var self = this;
 
     $elements.each(function (idx, ele) {
       var $ele = $(ele);
-      $ele.animate({
-        left: -($ele.outerWidth() - 10)
-      }, 1000, "easeOutBack", function () { $elements.removeClass("menu-active"); });
+      self.HideOption($ele, true).done(function () { $ele.removeClass("menu-active"); });
     });
 
     return $elements.promise();
   };
 
+  /**
+   * Gets the active element
+   */
+  SideMenu.prototype.GetActiveElement = function () {
+    return this.GetContainer().find(".menu-active").first();
+  };
 
   /**
    * Activates the specified element and moves it to the second position
@@ -161,11 +171,21 @@
    * @param {HTMLElement}  $element   jQuery element to be displayed 
    */
   SideMenu.prototype.ActivateOption = function ($element) {
+
+    if ($element[0].nodeName !== "LI") {
+      $element = $element.closest("li");
+    }
+
+    if ($element.hasClass("menu-active")) {
+      return;
+    }
+
     // Hide active ones
     var $active = $(".menu-active");
     var self = this;
 
     $active.removeClass("menu-active");
+    $(document).trigger("sidemenu:active-hidden", [$active]);
 
     self.HideOption($active, true).done(function () {
 
@@ -174,11 +194,11 @@
       $li.addClass("menu-transition");
 
       self.HideOption($li, true).done(function () {
-        self.ScrollTo($li, 2,
+        self.ScrollTo($li, self._position,
           function () {
             $li.addClass("menu-active");
-            $li.animate({"width" : "100%"});
-            $li.removeClass("menu-transition");
+            $li.animate({"width" : "100%"}, function () { $li.removeClass("menu-transition"); });
+            $(document).trigger("sidemenu:active-changed", [$li]);
           }
           );
       });
@@ -199,6 +219,7 @@
 
     this.SetPositions(option_height);
 
+    $(document).trigger("sidemenu:resize");
     return this;
   };
 
@@ -312,6 +333,8 @@
    */
   SideMenu.prototype.ShowOption = function ($ele, force) {
     return this.ToggleVisibilityOption($ele, force, function ($e) {
+      $(document).trigger("sidemenu:option-visibility", [$ele, 'show']);
+
       $e.animate({
         left: 0
       });
@@ -327,6 +350,8 @@
    */
   SideMenu.prototype.HideOption = function ($ele, force) {
     return this.ToggleVisibilityOption($ele, force, function ($e) {
+      $(document).trigger("sidemenu:option-visibility", [$ele, 'hide']);
+
       $e.css("width", "auto");
       $e.animate({
         left: -($ele.outerWidth() - 10)
@@ -353,7 +378,7 @@
       $ele = $ele.closest("li");
     }
 
-    if ($ele.hasClass("menu-transition") && !force) {
+    if (($ele.hasClass("menu-transition") || $ele.hasClass("menu-active")) && !force) {
       return $ele.promise();
     }
 
